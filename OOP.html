@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>test 1</title>
+		<title>OOP</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<style>
 			
@@ -23,6 +23,61 @@
 	</body>
 
 	<script>
-	
+	// -----------------------------------------------------------------
+		//---only example - don't work---
+		function Student(n, a) {
+			var name = n;
+			var age = a;
+			var sayHello = function() {
+				alert('Hello from' + name);
+			}
+		}
+
+
+		var s = new Student('Alex', 25);
+		// s.sayHello() //не спрацює - бо приватні змінні. зона видимості. ТОМУ:
+		//-----------------------------------
+		function Student1(n, a) {
+			this.name = n;
+			// var age = a; //private
+			this.age = a; 
+			var CONST = 80; //private
+
+			this.sayHello = function() {
+				console.log('Hello from ' + this.name);
+			}
+
+			this.getAge = function() {
+				// console.log('Age ' + this.name + ' is ' + age);
+				console.log('Age ' + this.name + ' is ' + this.age);
+			}
+			//---------------
+			this.getAgeDiff = function() {
+				console.log('Різниця e віці: ' + calc());//NaN
+					console.log(calc());//return CONST - this.age; => NaN;
+									//return this; => window !!!
+					console.log(this); // Student1 - what we need
+			}
+			var self = this; // We convey the context of execution from the outside
+			var calc = function() { //privat
+				// return this;    //Here 'this' is 'window' - global context
+				// return CONST - this.age;
+				return CONST - self.age;
+			}
+		}
+
+		var s1 = new Student1('Alex', 25);
+		var s3 = new Student1('Masha', 25);
+
+		s1.sayHello();
+		s1.getAge();
+
+		s1['getAge']();
+
+		s3.name = 'Lenka';
+		s3.sayHello();       //Hello from Lenka
+		//---------------------------------------
+		s1.getAgeDiff();
+		console.log('Global context: ' + this ); //window
 	</script>
 </html>
