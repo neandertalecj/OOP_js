@@ -12,13 +12,29 @@
 				outline: none;
 
 			}
-			
-			
+			/**/
+			.popup{
+				opacity: 0;
+				position: absolute;
+				padding: 10px;
+				border: 1px solid black;
+				background: white;
+				box-shadow: 0 0 10px black;
+				transition: opacity 0.5s ease;
+			}
+			.popup.active{
+				opacity: 1;
+			}
 			
 		</style>
 	</head>
 	<body>
-	
+		<div>My div
+			<!-- <div class="popup">....</div> -->
+		</div>
+		<h2>Header</h2>
+		<button>Click me</button>
+		<hr>
 
 	</body>
 
@@ -79,5 +95,113 @@
 		//---------------------------------------
 		s1.getAgeDiff();
 		console.log('Global context: ' + this ); //window
+	//-----------------------------------------------------------------
+	//-----------------------------------------------------------------
+	function HtmlElement(tag, content, bg) {
+		var el = document.createElement(tag);
+
+		this.show = function(){
+			el.innerHTML = content;
+			el.style.background = bg;
+			document.body.appendChild(el);
+		}
+		this.remove = function() {
+			document.body.removeChild(el);
+		}
+	}
+
+	var el = new HtmlElement('div', '<p>content</p>', 'red');
+	var el2 = new HtmlElement('h1', 'content2', 'pink');
+	var el3 = new HtmlElement('p', 'content3', 'green');
+	el.show();
+	el2.show();
+	el3.show();
+	el3.remove();
+	//-----------------------------------------------------------------
+	//---------The same with functions----------------------------------
+	function createEl(tag, content, bg){
+		var el = document.createElement(tag);
+		el.innerHTML = content;
+		el.style.background = bg;
+		document.body.appendChild(el);
+		return el;
+	}
+
+	function del(el) {
+		document.body.removeChild(el);
+	}
+
+	var el4 = createEl('div', '<p>content</p>', 'gray');
+	var el5 = createEl('div', '<p>content</p>', 'black');
+	del(el5);
+    // -----------------------------------------------------------------
+    // -----------informers---------------------------------------------
+    // function Popup(node, content, position){
+    function Popup(options){
+    	var tip = document.createElement('div');
+    	tip.classList.add('popup');
+    	tip.innerHTML = options.content;
+    	options.node.appendChild(tip);
+    	options.node.style.position = 'relative';
+    	addPosition(options.position);
+
+    	this.toggle = function() {
+    		tip.classList.toggle('active');
+    	}
+
+    	options.node.addEventListener('click', this.toggle); //Must be after 
+    								// this.toggle = ... Function Expression !!!
+
+    	function addPosition(position){
+    		switch(position) {
+    			case 'bottom':
+    				tip.style.bottom = '-100%';
+    				tip.style.left =  0;
+    				break;
+    		}
+    	}
+    }
+
+    var el6 = new Popup({
+    	node: document.getElementsByTagName('div')[0],
+    	content: 'This is a tip',
+    	position: 'bottom'
+    })
+    // ------------------------------
+    // ---it was good but it's better (with init):
+    	function Popup1(options){
+	    	var tip = document.createElement('div');
+	    	
+	    	this.init = function() {
+	    		tip.classList.add('popup');
+		    	tip.innerHTML = options.content;
+		    	options.node.appendChild(tip);
+		    	options.node.style.position = 'relative';
+		    	addPosition(options.position);
+		    	options.node.addEventListener('click', this.toggle); 
+	    	}
+
+	    	this.toggle = function() {
+	    		tip.classList.toggle('active');
+	    	}
+
+
+	    	function addPosition(position){
+	    		switch(position) {
+	    			case 'bottom':
+	    				tip.style.bottom = '-100%';
+	    				tip.style.left =  0;
+	    				break;
+	    		}
+	    	}
+	    	this.init();
+	    }
+
+	    var el7 = new Popup1({
+    	node: document.getElementsByTagName('h2')[0],
+    	content: 'This is a tip2',
+    	position: 'bottom'
+    })
+
 	</script>
 </html>
