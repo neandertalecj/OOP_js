@@ -342,5 +342,95 @@ function Slider(settings) {
 			slidesToShow: 1,
 			infinite: false
 		});
+
+
+//--------------------------------------------------------------------
+//----------Getter and Setter-----------------------------------------
+
+	function Rabbit(name) {
+	 	var totalDist = 0;
+	 	var timer;
+	 	this.name = name;
+	 	var uniqCharacter ="white";
+
+	 	this.run = function() {
+	 		timer = setInterval(function(){
+	 			console.log(totalDist++);
+	 		}, 1000);
+	 	}
+
+	 	this.stop = function(){
+	 		clearTimeout(timer);
+	 	}
+	 	//геттери і сеттери відповідають за то які дані збираються бути загружені чи получені. (Зробив this.totalDist -публічним - хтось може змінити, тому вона у нас локальнаю Прочитати можемо, а переписати ні)
+	 	this.get = function(propertyName) {
+	 		 if(propertyName == 'timer') { // імітує відсутність  
+	 		 	return undefined;
+	 		 }
+	 		 // return this['propertyName']; //тільки до публічних  
+	 		 if (this[propertyName] !== undefined) { // чи незапитуюють публічне свойство ??? 
+	 		 	return this[propertyName]; 
+	 		 } else {
+	 		 	return this['get_' + propertyName]();
+	 		 }
+	 	} 
+
+	 	this.get_totalDist =function() {
+	 		return totalDist;
+	 	} 
+
+	 	this.set_totalDist = function(value) {
+	 		value = +value;
+	 		if (!isNaN(value)) {
+	 			totalDist = value;
+	 		} else {
+	 			alert('error');
+	 		}
+	 	} 
+
+	 	this.getterSetterTotalDist = function(value) { //Так в jQuery - дивимося чи було щось передано
+	 		if (value === undefined) {
+	 			return totalDist;
+	 		} else {
+	 			value = +value; 
+	 			if (!isNaN(value)) {
+	 				totalDist = value;
+	 			} else {
+	 				alert('error');
+	 			}
+	 		}
+	 	}
+
+	 }
+
+
+	 var rabbit = new Rabbit('Bax');  
+	 // rabbit.run();
+	 // rabbit.stop();
+	 // rabbit.get('totalDist')
+	 // rabbit.get('name')
+
+	 // rabbit.getterSetterTotalDist()
+	 // rabbit.getterSetterTotalDist(40)
+
+	function MyHtml(id) {
+	 	var el = document.getElementById(id);
+
+	 	this.width = function(value) {
+	 		if (value === undefined) { //якщо не передали параметр
+	 			return getComputed(el).width; //вертаємо розмір наявний
+	 		} else {
+	 			value = parseFloat(value);
+	 			if (!isNaN(value)) {
+	 				el.style.width = value + 'px';
+	 			}
+	 		}
+	 	}
+	 }
+
+
+	 var a = new MyHtml('one');
+	 a.width('250px');
+	 
 	</script>
 </html>
