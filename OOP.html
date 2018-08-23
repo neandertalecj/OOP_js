@@ -95,6 +95,7 @@
 
 		</div>
 		<hr><br>
+		<div id="one"></div>
 	</body>
 
 	<script>
@@ -431,6 +432,63 @@ function Slider(settings) {
 
 	 var a = new MyHtml('one');
 	 a.width('250px');
+
+//------------------------------------------------------------------
+//--------------Inheritance-----------------------------------------
+	function Animal(name) {
+		var totalDist = 0;
+	 	var timer;
+	 	this.name = name;
+	 	var uniqCharacter ="white";
+
+	 	this.run = function() {
+	 		timer = setInterval(function(){
+	 			console.log(totalDist++);
+	 		}, 1000);
+	 	}
+
+	 	this.stop = function(){
+	 		clearTimeout(timer);
+	 	}
+
+	 	this.getterSetterTotalDist = function(value) { 
+	 		if (value === undefined) {
+	 			return totalDist;
+	 		} else {
+	 			value = +value; 
+	 			if (!isNaN(value)) {
+	 				totalDist = value;
+	 			} else {
+	 				alert('error');
+	 			}
+	 		}
+	 	}
+	}
+
+	function Cow(name) {
+		Animal.apply(this, [name]); //має бути масив, або:
+		// Animal.apply(this, arguments);
+
+		// this.name = name;
+		var a = 'erg';
+		var b = 'qwet';
+	}
+
+	function Cat(name) {
+		Animal.call(this);
+		this.name = name;
+		var c ='eqwrg';
+		var d = 'qetg';
+
+		this.fun = function() {
+			return totalDist; //Неспрацює. дочірні не мають прямого доступу до приватних свойств батьківського, хіба через геттер
+		}
+	}
+
+var cat = new Cat('Murka');
+// cat.run()
+// cat.stop()
+
 	 
 	</script>
 </html>
