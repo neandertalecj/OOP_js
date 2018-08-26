@@ -94,8 +94,27 @@
 			<button class="slider-button slider-button-next" data-action="right">next</button>
 
 		</div>
+
+
 		<hr><br>
 		<div id="one"></div>
+		<hr><br>
+
+
+		<div id="forma">
+		<form>
+			<input type="text" name="email" placeholder="email" data-rule="required email">
+			<input type="text" name="phone" placeholder="+28(254)00-000-00" data-rule="required phone">
+			<input type="text" name="password" placeholder="password" data-rule="required password">
+			<input type="checkbox" name="agree" data-rule="required">
+			<select name="city" data-rule="required">
+				<option value="1">Kiev</option>
+				<option value="2">Kharkiv</option>
+			</select>
+			<textarea name="message" data-rule="required" data-max="45"></textarea>
+			<button>Submit</button>
+		</form>		
+	</div>
 	</body>
 
 	<script>
@@ -489,6 +508,71 @@ var cat = new Cat('Murka');
 // cat.run()
 // cat.stop()
 
-	 
+
+// ----------------------------------------------------------
+	// -----Form validation--------------------------------------
+	// -------------Функціщнальний підхід------------------------
+	 var forma = document.getElementById('forma');
+	 var forms = forma.getElementsByTagName('form');
+	 for(var i = 0; i < forms.length; i++)  {
+	 	forms[i].addEventListener('submit', validator);
+	 }
+
+	 rules = {
+	 	required: function(el) {
+	 		if(el.value != '') {
+	 			return true;
+	 		}
+	 		return false;
+	 	},
+	 	email: function(el) {
+	 		var reg = /^\w{1,}@\w{1,}\.\w{2,}$/;
+	 		return reg.test(el.value);
+	 	}
+	 }
+
+	 function showErrors(arr) {
+	 	console.log(arr);
+	 }
+
+	 function validator(e) {
+	 	var errors = [];
+	 	// e.preventDefault(); //для провірки бо відправка усе затре
+	 	var inputs = this.elements; //якщо форм багато кожен раз на якій відбулась подія
+	 	// console.log(inputs);
+	 	for (var i = 0; i < inputs.length; i++) {
+	 		if (inputs[i].tagName != 'BUTTON') { //щоб rulesList.split(' '); не наривавався на 'BUTTON'
+		 		var rulesList = inputs[i].dataset.rule;
+		 		// console.log(rulesList); //"required email", "required phone"...
+		 		rulesList = rulesList.split(' '); //Cannot read property 'split' of undefined - Дебагером пройшлися викидало по чому проходиться поки не попало на кнопку - undefined. Понятно що такох властивості undefined не має
+		 		// console.log(rulesList); //["required", "email"]...
+		 		for (var j = 0; j < rulesList.length; j++) {
+		 			if (rulesList[j] in rules) { //додали бо вибивало помилку "rules[rulesList[j]] is not a function" бо у нас не були описанне усе в rules
+			 			if(!rules[rulesList[j]](inputs[i])){
+			 				errors.push({
+			 					name: inputs[i].name,
+			 					error: rulesList[j]
+			 				})
+			 			}
+		 			}
+			 	}
+	 		}
+	 		// if (errors.length > 0) {
+	 		// 	e.preventDefault();
+	 		// 	showErrors(errors);
+	 		// }
+	 	}//for i
+	 	if (errors.length > 0) {
+	 			e.preventDefault();
+	 			showErrors(errors);
+	 	}
+
+	 }
+
+	 // forms[0].elements.email.dataset.rule.split(' '); --> 
+	 	// ["required", "email"] //name='email'; data-rule="required email"
+
+	 // ------------------------------------------------------------------
+	 // ------------------------------------------------------------------
 	</script>
 </html>
