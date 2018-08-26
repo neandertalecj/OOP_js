@@ -72,6 +72,21 @@
 				width: 100%;
 				overflow: hidden;
 			}
+
+			/*Validator form -2- OOP*/
+			/*додавати клас .error будемо до <div class="input error">*/
+			.input.error .field{
+				border: 1px solid red;
+			}
+			.input.error .message{
+				color: red;
+			}
+			.input.success .field{
+				border: 1px solid green;
+			}
+			.input.success .message{
+				color: green;
+			}
 			
 		</style>
 	</head>
@@ -102,19 +117,40 @@
 
 
 		<div id="forma">
-		<form>
-			<input type="text" name="email" placeholder="email" data-rule="required email">
-			<input type="text" name="phone" placeholder="+28(254)00-000-00" data-rule="required phone">
-			<input type="text" name="password" placeholder="password" data-rule="required password">
-			<input type="checkbox" name="agree" data-rule="required">
-			<select name="city" data-rule="required">
-				<option value="1">Kiev</option>
-				<option value="2">Kharkiv</option>
-			</select>
-			<textarea name="message" data-rule="required" data-max="45"></textarea>
+			<form>
+				<input type="text" name="email" placeholder="email" data-rule="required email">
+				<input type="text" name="phone" placeholder="+28(254)00-000-00" data-rule="required phone">
+				<input type="text" name="password" placeholder="password" data-rule="required password">
+				<input type="checkbox" name="agree" data-rule="required">
+				<select name="city" data-rule="required">
+					<option value="1">Kiev</option>
+					<option value="2">Kharkiv</option>
+				</select>
+				<textarea name="message" data-rule="required" data-max="45"></textarea>
+				<button>Submit</button>
+			</form>		
+		</div>
+		<hr><br>
+
+	<!-- Validator form -2- OOP -->
+		<form id="myform">
+			<div class="input">
+				<!-- label , field,  message -->
+				<label for="inp1">Inp1</label>
+				<input type="text" name="inp1" id="inp1" class="field" data-error="Ви перевищили ліміт!">
+				<div class="message"></div>
+			</div>
+
+			<div class="input">
+				<label for="inp2">Inp2</label>
+				<input type="text" name="inp2" id="inp2" class="field" data-error="Ви перевищили ліміт!">
+				<div class="message"></div>
+			</div>
+
 			<button>Submit</button>
-		</form>		
-	</div>
+			<!-- якщо кгопці не присвоїли type: по замовчуванні  type="submit"-->
+			<button type="reset">Reset</button>
+		</form>
 	</body>
 
 	<script>
@@ -574,5 +610,125 @@ var cat = new Cat('Murka');
 
 	 // ------------------------------------------------------------------
 	 // ------------------------------------------------------------------
+
+
+
+	 // ----------------------------------------------------------
+	// --------Form Validator - 2 - OOP------Треба Допиляти--------------------------
+	// Що маємо зробити: Створити екземпляр і передати якісь настройки
+		// var v = Validator({
+		// 	idEl, customRules
+		// })
+	// Нам в першу чергу треба описати  методи відображення стану - успішно чи не успішно. Це мають бути приватні методи чи публічні - будимо ми потребувати ззовні їх викликати чи ні? Нам цього не треба, тому ми їх робимо скритими.
+	
+	var validatorMethods = {
+		notEmpty: function(el) {
+			if (el.value == '') {
+				return false
+			}
+			return true;
+		},
+		pattern: function(el, pattrn) {
+			return pattrn.test(el.value); 
+		},
+		contains: function(el, el2) {
+			if (el.value == el2.value) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	function Validator(setting) {
+		var formEl = document.getElementById(setting.id);
+		var formFields = formEl.elements;
+		var errors = [];
+		var rulesPattern = {
+			email: /^\w{1,}@\w{1,}\.\w{2,}$/, //тут і фурк анонімну можна тримати
+			tel: /^\+38\(\d{3}\)\d{7}$/,
+		}
+
+		var showError = function(el) {
+			el.parentNode.classList.remove('success');
+			el.parentNode.classList.add('error');
+			el.nextElementSibling.innerHTML = el.dataset.error; 
+		}
+		var showSuccess = function(el) {
+			//classList.contains('errors') - можна провірити
+			el.parentNode.classList.remove('error');  
+			el.parentNode.classList.add('success');  // Дублювання коду
+			el.nextElementSibling.innerHTML = '' ; 
+		}
+		//90% часу іде на обдумання логіки, а синтаксис то вже справа двадцять пята
+
+		var isValid = function(el) {
+			var methods = setting[el.getAttribute('id')];
+			if(methods !== undefined) { //якщо не передали ніяких даних для якогось інпута бо не треба перевіряти
+				for(var i = 0; i < methods.length; i++){
+					if(!validatorMethods[methods[i][0]](el, methods[i][i])) { //validatorMethods.notEmpty() ...
+						error.push({el: el});
+					}
+				}
+				for (var i = 0; i < errors.length; i++ ) {
+					if (error[i].el == el) {
+						return false;
+					}
+				}
+			}
+			return true
+		}
+
+		var checkIt = function() {
+
+			if (isValid(this )) {
+				showSuccess(this);
+				for (var i = 0; i < errors.length; i++) {
+					if(errors[i].el == this) {
+						 delete(errors[i]); // але таке видалення зробить дирку в масиві - undefined
+						//  !!! щоб без дирки удалити методом slice...? Дав на самостійну роботу
+					}
+				}
+			} else {
+				showError(this);
+				errors.push({
+					el: this, //як це конкретний потім видалити якщо виправлять
+				})
+			}
+		}
+
+		//init here
+		for (var i = 0; i < formFields.length; i++) {
+			if(formFields[i] == 'BUTTON') {
+				continue;
+			}
+			formFields[i].addEventListener('change' , checkIt);
+		}
+
+		for (var prop in setting.pattern) {
+			rulesPattern[prop] = setting.pattern[prop];
+		}
+	}
+	  
+
+
+// ----Configuration
+	var v = new Validator({
+		id: 'myform',
+		pattern: {
+			tel: /^\+\d{1,3}\(\d{3}\)\d{7}$/,
+			address: /^$/, // У нас такої власт. нема - динамічно додасть
+		},
+		methods: {//для ел описуємо правила
+			'inp1': [
+				['notEmpty'], 
+				['contains', 'inp2'], 
+				['pattern', 'email']
+			],
+			
+		}
+	});
+
+	// ------------------------------------------------------------------
+	// ------------------------------------------------------------------
 	</script>
 </html>
